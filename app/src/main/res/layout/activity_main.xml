@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context="ru.ifmo.se.droidscan.MainActivity">
 
     <Button
         android:id="@+id/button"
@@ -20,14 +20,15 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="362dp"
-        android:layout_height="583dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginLeft="24dp"
-        android:layout_marginTop="10dp"
+        android:layout_width="282dp"
+        android:layout_height="435dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="84dp"
         android:layout_marginEnd="24dp"
         android:layout_marginRight="24dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.577"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button"
         tools:srcCompat="@tools:sample/backgrounds/scenic" />

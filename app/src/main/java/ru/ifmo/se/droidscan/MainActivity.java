@@ -1,70 +1,86 @@
-package com.example.droidscan;
+package ru.ifmo.se.droidscan;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
+
+import com.example.droidscan.R;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Date;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int CAMERA_REQUEST = 0;
+    static final int REQUEST_TAKE_PHOTO = 1;
+    private String mCurrentPhotoPath;
     private ImageView imageView;
-    private Uri outputFileUri;
-
+    private Uri photoURI;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        imageView = findViewById(R.id.imageView);
 
+        imageView = findViewById(R.id.imageView);
     }
 
-    public void onClick(View v) {
-        getThumbnailPicture();
-        //   saveFullPicture();
+    public void onClick(View view) {
+        dispatchTakePictureIntent();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CAMERA_REQUEST && resultCode == RESULT_OK) {
-            // Проверяем, содержит ли результат маленькую картинку
-            if (data != null) {
-                if (data.hasExtra("data")) {
-                    Bitmap thumbnailBitmap = data.getParcelableExtra("data");
-                    imageView.setImageBitmap(thumbnailBitmap);
-                }
-            } else {
-                // Какие-то действия с полноценным изображением,
-                // сохраненным по адресу outputFileUri
-                imageView.setImageURI(outputFileUri);
-            }
+
+        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+            imageView.setImageURI(photoURI);
         }
     }
 
-    public void getThumbnailPicture() {
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(cameraIntent, CAMERA_REQUEST);
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyMMddHHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp;
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(imageFileName, ".jpg", storageDir);
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
     }
 
-    public void saveFullPicture() {
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        File file = new File(Environment.getExternalStorageDirectory(),
-                "test.jpg");
-        outputFileUri = Uri.fromFile(file);
-        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-        startActivityForResult(cameraIntent, CAMERA_REQUEST);
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+                Toast.makeText(this, "Error!", Toast.LENGTH_SHORT).show();
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                photoURI = FileProvider.getUriForFile(this,
+                        "com.example.android.provider",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+            }
+        }
     }
-
-
 }
