@@ -5,25 +5,30 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.droidscan.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class MainActivity extends AppCompatActivity {
-
     static final int REQUEST_TAKE_PHOTO = 1;
     static final int REQUEST_CODE_PERMISSION_CAMERA = 1;
     private String mCurrentPhotoPath;
     private ImageView imageView;
     private Uri photoURI;
 
-     
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
             Intent cameraIntent = new Intent(MainActivity.this, CameraIntentService.class);
             startService(cameraIntent);
 
-
         } else {
            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.CAMERA},
                    REQUEST_CODE_PERMISSION_CAMERA);
@@ -49,14 +53,14 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
-            imageView.setImageURI(photoURI);
-        }
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//
+//        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+//            imageView.setImageURI(photoURI);
+//        }
+//    }
 
 //    private File createImageFile() throws IOException {
 //        // Create an image file name

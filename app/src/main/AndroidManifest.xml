@@ -17,10 +17,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <service
-            android:name="ru.ifmo.se.droidscan.CameraService"
-            android:enabled="true"
-            android:exported="true"></service>
-        <service
             android:name="ru.ifmo.se.droidscan.CameraIntentService"
             android:exported="false" />
 
