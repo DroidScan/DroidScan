@@ -23,8 +23,6 @@ import java.util.List;
 
 public class ContactsActivity extends AppCompatActivity {
 
-    private static final String TAG_ANDROID_CONTACTS = "ANDROID_CONTACTS";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
