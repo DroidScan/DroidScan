@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<<<<<<< HEAD
     xmlns:tools="http://schemas.android.com/tools"
     package="ru.ifmo.se.droidscan">
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
+=======
+    package="ru.ifmo.se.droidscan">
+>>>>>>> 22c69d49aa1df7025e21ec4a62ebde64a797111d
 
     <application
         android:allowBackup="true"
@@ -12,6 +16,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+<<<<<<< HEAD
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
 
@@ -19,6 +24,9 @@
 
         <activity android:name=".StorageCameraActivity"/>
 
+=======
+        android:theme="@style/AppTheme">
+>>>>>>> 22c69d49aa1df7025e21ec4a62ebde64a797111d
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
