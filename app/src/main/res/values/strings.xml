@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">DroidScan</string>
+    <string name="btn_storage">Storage</string>
+    <string name="NoAccessMsg">Сервис не запущен, теперь мы не можем показать вам кота:(</string>
+</resources>
