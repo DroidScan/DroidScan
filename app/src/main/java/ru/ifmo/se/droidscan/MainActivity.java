@@ -1,32 +1,32 @@
 package ru.ifmo.se.droidscan;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ImageView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback;
+import androidx.core.content.ContextCompat;
 
 import com.example.droidscan.R;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+
+import static android.Manifest.permission.CAMERA;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 
-public class MainActivity extends AppCompatActivity {
-    static final int REQUEST_TAKE_PHOTO = 1;
-    static final int REQUEST_CODE_PERMISSION_CAMERA = 1;
-    private String mCurrentPhotoPath;
-    private ImageView imageView;
-    private Uri photoURI;
+public class MainActivity extends AppCompatActivity implements OnRequestPermissionsResultCallback {
+
+    private static final String[] CAMERA_REQUIRED_PERMISSIONS = {
+            WRITE_EXTERNAL_STORAGE, CAMERA
+    };
+
+    private static final int CAMERA_REQUEST_CODE_PERMISSION = 42;
 
 
     @Override
@@ -34,66 +34,53 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        imageView = findViewById(R.id.imageView);
-    }
+        hasPermissions();
 
-    public void onClick(View view) {
-        int permissionStatus = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
-
-        if (permissionStatus == PackageManager.PERMISSION_GRANTED) {
-          // dispatchTakePictureIntent();
-
-            Intent cameraIntent = new Intent(MainActivity.this, CameraIntentService.class);
-            startService(cameraIntent);
-
-        } else {
-           ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.CAMERA},
-                   REQUEST_CODE_PERMISSION_CAMERA);
+        if (Arrays.stream(CAMERA_REQUIRED_PERMISSIONS).allMatch(this::hasPermission)) {
+            startService();
         }
 
     }
 
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//
-//        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
-//            imageView.setImageURI(photoURI);
-//        }
-//    }
+    private void startService() {
+        Intent cameraIntent = new Intent(MainActivity.this, CameraIntentService.class);
+        startService(cameraIntent);
+    }
 
-//    private File createImageFile() throws IOException {
-//        // Create an image file name
-//        String timeStamp = new SimpleDateFormat("yyMMddHHmmss").format(new Date());
-//        String imageFileName = "JPEG_" + timeStamp;
-//        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-//        File image = File.createTempFile(imageFileName, ".jpg", storageDir);
-//
-//        // Save a file: path for use with ACTION_VIEW intents
-//        mCurrentPhotoPath = image.getAbsolutePath();
-//        return image;
-//    }
-//
-//    private void dispatchTakePictureIntent() {
-//        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//        // Ensure that there's a camera activity to handle the intent
-//        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-//            // Create the File where the photo should go
-//            File photoFile = null;
-//            try {
-//                photoFile = createImageFile();
-//            } catch (IOException ex) {
-//                // Error occurred while creating the File
-//                Toast.makeText(this, "Error!", Toast.LENGTH_SHORT).show();
-//            }
-//            // Continue only if the File was successfully created
-//            if (photoFile != null) {
-//                photoURI = FileProvider.getUriForFile(this,
-//                        "com.example.android.provider",
-//                        photoFile);
-//                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-//                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
-//            }
-//        }
-//    }
+    private void showToast(final String text) {
+        runOnUiThread(() -> Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show());
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case CAMERA_REQUEST_CODE_PERMISSION: {
+                if (grantResults.length > 0 && Arrays.stream(grantResults).allMatch(MainActivity::checkPermission)) {
+                    startService();
+                } else {
+                    showToast("Сервис не был запущен, теперь мы не можем сфотографировать вас :(");
+                }
+            }
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void hasPermissions() {
+        final String[] neededPermissions = Arrays.stream(CAMERA_REQUIRED_PERMISSIONS)
+                .filter(permission -> !hasPermission(permission))
+                .toArray(String[]::new);
+
+        if (neededPermissions.length > 0) {
+            requestPermissions(neededPermissions, CAMERA_REQUEST_CODE_PERMISSION);
+        }
+    }
+
+    private boolean hasPermission(final String permission) {
+        return checkPermission(ContextCompat.checkSelfPermission(getApplicationContext(), permission));
+    }
+
+    private static boolean checkPermission(final int permissionResult) {
+        return permissionResult == PERMISSION_GRANTED;
+    }
+
 }
