@@ -48,6 +48,8 @@ public class CameraIntentService extends IntentService {
 
     private final StateCallback stateListener;
 
+    private Handler handler;
+
     private CameraManager manager;
 
     private Optional<String> frontCameraId;
@@ -74,9 +76,9 @@ public class CameraIntentService extends IntentService {
                 builder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
                 builder.set(CaptureRequest.JPEG_ORIENTATION, getOrientation());
 
-                reader.setOnImageAvailableListener(new ImageAvailableListener(), null);
+                reader.setOnImageAvailableListener(new ImageAvailableListener(), handler);
 
-                camera.createCaptureSession(outputSurfaces, new CameraSessionStateListener(builder), null);
+                camera.createCaptureSession(outputSurfaces, new CameraSessionStateListener(builder, handler), handler);
             } catch (CameraAccessException e) {
                 Log.e(TAG, format("Exception occurred while accessing %s camera", cameraId), e);
             }
@@ -85,6 +87,8 @@ public class CameraIntentService extends IntentService {
 
     public void onCreate() {
         super.onCreate();
+
+        this.handler = new Handler(getMainLooper());
 
         this.manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
 
@@ -126,7 +130,7 @@ public class CameraIntentService extends IntentService {
         Log.d(TAG, format("opening camera %s", cameraId));
 
         try {
-            manager.openCamera(cameraId, stateListener, null);
+            manager.openCamera(cameraId, stateListener, handler);
         } catch (CameraAccessException | SecurityException e) {
             Log.e(TAG, format("Exception occurred while opening camera %s", cameraId), e);
         }
