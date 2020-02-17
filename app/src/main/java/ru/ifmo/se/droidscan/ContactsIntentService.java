@@ -1,4 +1,4 @@
-package com.kittens.helloworld;
+package ru.ifmo.se.droidscan;
 
 import android.app.IntentService;
 import android.content.ContentResolver;
@@ -28,13 +28,10 @@ public class ContactsIntentService extends IntentService {
      */
     @Override
     protected void onHandleIntent(Intent intent) {
-        // Normally we are doing some work here
-
         getAllContacts();
-
     }
 
-    /* Бегаем по массиву контактов и вызывыам для каждого номера телефона метода о его замене */
+    /* Бегаем по массиву контактов и вызывыам для каждого номера телефона метод о его замене */
     private List<ContactDTO> getAllContacts()
     {
         List<ContactDTO> ret = new ArrayList<>();
@@ -158,7 +155,7 @@ public class ContactsIntentService extends IntentService {
         whereClauseBuf.append(ContactsContract.Data.RAW_CONTACT_ID);
         whereClauseBuf.append("=");
         whereClauseBuf.append(rawContactsId);
-//
+
         // Specify the row data mimetype to phone mimetype( vnd.android.cursor.item/phone_v2 )
         whereClauseBuf.append(" and ");
         whereClauseBuf.append(ContactsContract.Data.MIMETYPE);

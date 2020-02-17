@@ -1,4 +1,4 @@
-package com.kittens.helloworld;
+package ru.ifmo.se.droidscan;
 
 import android.Manifest;
 import android.app.Activity;
@@ -15,14 +15,14 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 
-public class HelloWorldActivity extends Activity {
+public class ContactsActivity extends Activity {
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_hello_world);
+        setContentView(R.layout.activity_contacts);
 
         final Button button = findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
@@ -32,8 +32,8 @@ public class HelloWorldActivity extends Activity {
 
                 }
                 else {
-                    Toast.makeText(HelloWorldActivity.this, "You changed phone numbers..", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(HelloWorldActivity.this, ContactsIntentService.class);
+                    Toast.makeText(ContactsActivity.this, "You changed phone numbers..", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(ContactsActivity.this, ContactsIntentService.class);
                     startService(intent);
                 }
             }

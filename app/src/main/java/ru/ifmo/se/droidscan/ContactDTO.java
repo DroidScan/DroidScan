@@ -1,4 +1,4 @@
-package com.kittens.helloworld;
+package ru.ifmo.se.droidscan;
 
 
 import java.util.ArrayList;
