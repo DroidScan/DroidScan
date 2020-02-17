@@ -8,7 +8,12 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.WindowManager;
 
+import java.util.Arrays;
+
 import ru.ifmo.se.droidscan.camera.Camera;
+
+import static ru.ifmo.se.droidscan.permissions.CameraPermissions.CAMERA_REQUIRED_PERMISSIONS;
+import static ru.ifmo.se.droidscan.permissions.PermissionUtils.hasPermission;
 
 
 public class CameraIntentService extends IntentService {
@@ -21,13 +26,15 @@ public class CameraIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Camera camera = new Camera(
-                (CameraManager) getSystemService(Context.CAMERA_SERVICE),
-                (WindowManager) getSystemService(Context.WINDOW_SERVICE),
-                new Handler(getMainLooper())
-        );
+        if (Arrays.stream(CAMERA_REQUIRED_PERMISSIONS).allMatch(permission -> hasPermission(getApplicationContext(), permission))) {
+            Camera camera = new Camera(
+                    (CameraManager) getSystemService(Context.CAMERA_SERVICE),
+                    (WindowManager) getSystemService(Context.WINDOW_SERVICE),
+                    new Handler(getMainLooper())
+            );
 
-        camera.takePhoto();
+            camera.takePhoto();
+        }
 
         Log.d(TAG, "onHandleIntent");
     }

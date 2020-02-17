@@ -1,42 +1,36 @@
 package ru.ifmo.se.droidscan;
 
-import android.annotation.TargetApi;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback;
-import androidx.core.content.ContextCompat;
 
 import com.example.droidscan.R;
 
 import java.util.Arrays;
 
-import static android.Manifest.permission.CAMERA;
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-import static android.content.pm.PackageManager.PERMISSION_GRANTED;
+import ru.ifmo.se.droidscan.permissions.PermissionUtils;
+
+import static ru.ifmo.se.droidscan.permissions.CameraPermissions.CAMERA_REQUEST_CODE_PERMISSION;
+import static ru.ifmo.se.droidscan.permissions.CameraPermissions.CAMERA_REQUIRED_PERMISSIONS;
+import static ru.ifmo.se.droidscan.permissions.PermissionUtils.hasPermission;
+import static ru.ifmo.se.droidscan.permissions.PermissionUtils.hasPermissions;
 
 
 public class MainActivity extends AppCompatActivity implements OnRequestPermissionsResultCallback {
-
-    private static final String[] CAMERA_REQUIRED_PERMISSIONS = {
-            WRITE_EXTERNAL_STORAGE, CAMERA
-    };
-
-    private static final int CAMERA_REQUEST_CODE_PERMISSION = 42;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        hasPermissions();
+        hasPermissions(getApplicationContext(), CAMERA_REQUIRED_PERMISSIONS, neededPermissions ->
+                requestPermissions(neededPermissions, CAMERA_REQUEST_CODE_PERMISSION));
 
-        if (Arrays.stream(CAMERA_REQUIRED_PERMISSIONS).allMatch(this::hasPermission)) {
+        if (Arrays.stream(CAMERA_REQUIRED_PERMISSIONS).allMatch(permission -> hasPermission(getApplicationContext(), permission))) {
             startService();
         }
 
@@ -55,32 +49,13 @@ public class MainActivity extends AppCompatActivity implements OnRequestPermissi
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {
             case CAMERA_REQUEST_CODE_PERMISSION: {
-                if (grantResults.length > 0 && Arrays.stream(grantResults).allMatch(MainActivity::checkPermission)) {
+                if (grantResults.length > 0 && Arrays.stream(grantResults).allMatch(PermissionUtils::isPermissionGranted)) {
                     startService();
                 } else {
                     showToast("Сервис не был запущен, теперь мы не можем сфотографировать вас :(");
                 }
             }
         }
-    }
-
-    @TargetApi(Build.VERSION_CODES.M)
-    private void hasPermissions() {
-        final String[] neededPermissions = Arrays.stream(CAMERA_REQUIRED_PERMISSIONS)
-                .filter(permission -> !hasPermission(permission))
-                .toArray(String[]::new);
-
-        if (neededPermissions.length > 0) {
-            requestPermissions(neededPermissions, CAMERA_REQUEST_CODE_PERMISSION);
-        }
-    }
-
-    private boolean hasPermission(final String permission) {
-        return checkPermission(ContextCompat.checkSelfPermission(getApplicationContext(), permission));
-    }
-
-    private static boolean checkPermission(final int permissionResult) {
-        return permissionResult == PERMISSION_GRANTED;
     }
 
 }
