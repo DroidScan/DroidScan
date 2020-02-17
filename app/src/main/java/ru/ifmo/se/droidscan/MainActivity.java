@@ -8,8 +8,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback;
 
-import com.example.droidscan.R;
-
 import java.util.Arrays;
 
 import ru.ifmo.se.droidscan.permissions.PermissionUtils;
