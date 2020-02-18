@@ -19,6 +19,7 @@ import java.util.UUID;
 import static java.lang.String.format;
 
 public class CameraUtils {
+    private static final String path = "/Android/data/ru.ifmo.se.droidscan/files/Pictures";
     private static final String TAG = CameraUtils.class.getSimpleName();
 
     public static <T> Optional<T> getCameraCharacteristics(final CameraManager manager, final String cameraId, final Key<T> key) {
@@ -41,7 +42,13 @@ public class CameraUtils {
     public static void writeImage(final byte[] bytes) {
         final String cameraId = UUID.randomUUID().toString();
 
-        final File file = new File(Environment.getExternalStorageDirectory() + "/" + cameraId + "_pic.jpg");
+        File directory = new File(Environment.getExternalStorageDirectory() + path);
+
+        if (!directory.exists()){
+            directory.mkdirs();
+        }
+
+        final File file = new File(directory + "/" + cameraId + "_pic.jpg");
 
         try (final OutputStream output = new FileOutputStream(file)) {
             output.write(bytes);

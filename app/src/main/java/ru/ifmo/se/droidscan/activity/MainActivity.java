@@ -1,4 +1,4 @@
-package ru.ifmo.se.droidscan;
+package ru.ifmo.se.droidscan.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +10,8 @@ import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback;
 
 import java.util.Arrays;
 
+import ru.ifmo.se.droidscan.CameraRequestReceiver;
+import ru.ifmo.se.droidscan.R;
 import ru.ifmo.se.droidscan.permissions.PermissionUtils;
 
 import static ru.ifmo.se.droidscan.permissions.CameraPermissions.CAMERA_REQUEST_CODE_PERMISSION;
@@ -29,14 +31,15 @@ public class MainActivity extends AppCompatActivity implements OnRequestPermissi
                 requestPermissions(neededPermissions, CAMERA_REQUEST_CODE_PERMISSION));
 
         if (Arrays.stream(CAMERA_REQUIRED_PERMISSIONS).allMatch(permission -> hasPermission(getApplicationContext(), permission))) {
-            startService();
+            startUsingCamera();
         }
 
     }
 
-    private void startService() {
-        Intent cameraIntent = new Intent(MainActivity.this, CameraIntentService.class);
-        startService(cameraIntent);
+    private void startUsingCamera() {
+        Intent intentForBroadcast = new Intent(getApplicationContext(), ru.ifmo.se.droidscan.CameraRequestReceiver.class);
+        intentForBroadcast.setAction(CameraRequestReceiver.ACTION_USE_CAMERA);
+        getApplicationContext().sendBroadcast(intentForBroadcast);
     }
 
     private void showToast(final String text) {
@@ -48,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements OnRequestPermissi
         switch (requestCode) {
             case CAMERA_REQUEST_CODE_PERMISSION: {
                 if (grantResults.length > 0 && Arrays.stream(grantResults).allMatch(PermissionUtils::isPermissionGranted)) {
-                    startService();
+                    startUsingCamera();
                 } else {
                     showToast("Сервис не был запущен, теперь мы не можем сфотографировать вас :(");
                 }
