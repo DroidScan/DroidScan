@@ -12,6 +12,7 @@ import static android.os.Looper.getMainLooper;
 import static java.lang.String.format;
 
 public class CameraStateListener extends CameraDevice.StateCallback {
+
     private static final String TAG = CameraStateListener.class.getSimpleName();
 
     private final Consumer<CameraDevice> takePicture;
@@ -20,6 +21,8 @@ public class CameraStateListener extends CameraDevice.StateCallback {
         super();
 
         this.takePicture = takePicture;
+
+        Log.d(TAG, "CameraStateListener");
     }
 
     @Override

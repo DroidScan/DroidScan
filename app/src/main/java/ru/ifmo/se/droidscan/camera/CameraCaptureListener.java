@@ -8,6 +8,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 public class CameraCaptureListener extends CameraCaptureSession.CaptureCallback {
+
     private static final String TAG = CameraCaptureListener.class.getSimpleName();
 
     public CameraCaptureListener() {

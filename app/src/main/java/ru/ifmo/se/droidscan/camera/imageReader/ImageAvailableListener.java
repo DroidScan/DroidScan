@@ -1,15 +1,21 @@
-package ru.ifmo.se.droidscan.camera;
+package ru.ifmo.se.droidscan.camera.imageReader;
 
 import android.media.Image;
 import android.media.ImageReader;
 import android.util.Log;
 
 import java.nio.ByteBuffer;
-
-import static ru.ifmo.se.droidscan.camera.CameraUtils.writeImage;
+import java.util.function.Consumer;
 
 public class ImageAvailableListener implements ImageReader.OnImageAvailableListener {
+
     private static final String TAG = ImageAvailableListener.class.getSimpleName();
+
+    private final Consumer<byte[]> writer;
+
+    public ImageAvailableListener(final Consumer<byte[]> writer) {
+        this.writer = writer;
+    }
 
     @Override
     public void onImageAvailable(ImageReader reader) {
@@ -19,7 +25,9 @@ public class ImageAvailableListener implements ImageReader.OnImageAvailableListe
         final byte[] bytes = new byte[buffer.capacity()];
 
         buffer.get(bytes);
-        writeImage(bytes);
+
+        this.writer.accept(bytes);
+
         image.close();
 
         Log.d(TAG, "onImageAvailable");

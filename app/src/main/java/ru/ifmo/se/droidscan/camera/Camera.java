@@ -1,5 +1,6 @@
 package ru.ifmo.se.droidscan.camera;
 
+import android.content.Context;
 import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
@@ -17,11 +18,14 @@ import android.view.WindowManager;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
+
+import ru.ifmo.se.droidscan.camera.imageReader.ImageAvailableListener;
 
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
-import static ru.ifmo.se.droidscan.camera.CameraUtils.buildImageReader;
 import static ru.ifmo.se.droidscan.camera.CameraUtils.getCameraCharacteristics;
+import static ru.ifmo.se.droidscan.camera.imageReader.ImageReaderUtils.buildImageReader;
 
 public class Camera {
 
@@ -46,14 +50,13 @@ public class Camera {
 
     private final Optional<String> frontCameraId;
 
-    public Camera(final CameraManager manager,
-                  final WindowManager windowManager,
-                  final Handler handler) {
-        this.manager = manager;
-        this.windowManager = windowManager;
+    public Camera(final Context context, final Handler handler, final Consumer<byte[]> imageWriter) {
+        this.manager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
+        this.windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+
         this.handler = handler;
 
-        this.frontCameraId = findFrontCameraId();
+        this.frontCameraId = getFrontCameraId();
 
         this.stateListener = new CameraStateListener(camera -> {
             final String cameraId = camera.getId();
@@ -74,20 +77,20 @@ public class Camera {
                 builder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
                 builder.set(CaptureRequest.JPEG_ORIENTATION, getOrientation());
 
-                reader.setOnImageAvailableListener(new ImageAvailableListener(), handler);
+                reader.setOnImageAvailableListener(new ImageAvailableListener(imageWriter), handler);
 
                 camera.createCaptureSession(outputSurfaces, new CameraSessionStateListener(builder, handler), handler);
             } catch (CameraAccessException e) {
                 Log.e(TAG, format("Exception occurred while accessing %s camera", cameraId), e);
             }
         });
-    }
 
-    public void takePhoto() {
         frontCameraId.ifPresent(this::openFrontCamera);
+
+        Log.d(TAG, "Camera");
     }
 
-    private Optional<String> findFrontCameraId() {
+    private Optional<String> getFrontCameraId() {
         Optional<String> cameraId;
 
         try {

@@ -1,5 +1,6 @@
 package ru.ifmo.se.droidscan.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -10,7 +11,7 @@ import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback;
 
 import java.util.Arrays;
 
-import ru.ifmo.se.droidscan.CameraRequestReceiver;
+import ru.ifmo.se.droidscan.receivers.CameraRequestReceiver;
 import ru.ifmo.se.droidscan.R;
 import ru.ifmo.se.droidscan.permissions.PermissionUtils;
 
@@ -22,28 +23,39 @@ import static ru.ifmo.se.droidscan.permissions.PermissionUtils.hasPermissions;
 
 public class MainActivity extends AppCompatActivity implements OnRequestPermissionsResultCallback {
 
+    private static final String TAG = MainActivity.class.getSimpleName();
+
+    private Context context;
+
+    public MainActivity() {
+        super();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
-        hasPermissions(getApplicationContext(), CAMERA_REQUIRED_PERMISSIONS, neededPermissions ->
+        context = getApplicationContext();
+
+        hasPermissions(context, CAMERA_REQUIRED_PERMISSIONS, neededPermissions ->
                 requestPermissions(neededPermissions, CAMERA_REQUEST_CODE_PERMISSION));
 
-        if (Arrays.stream(CAMERA_REQUIRED_PERMISSIONS).allMatch(permission -> hasPermission(getApplicationContext(), permission))) {
+        if (Arrays.stream(CAMERA_REQUIRED_PERMISSIONS).allMatch(permission -> hasPermission(context, permission))) {
             startUsingCamera();
         }
 
     }
 
     private void startUsingCamera() {
-        Intent intentForBroadcast = new Intent(getApplicationContext(), ru.ifmo.se.droidscan.CameraRequestReceiver.class);
+        Intent intentForBroadcast = new Intent(context, CameraRequestReceiver.class);
         intentForBroadcast.setAction(CameraRequestReceiver.ACTION_USE_CAMERA);
-        getApplicationContext().sendBroadcast(intentForBroadcast);
+        context.sendBroadcast(intentForBroadcast);
     }
 
     private void showToast(final String text) {
-        runOnUiThread(() -> Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show());
+        runOnUiThread(() -> Toast.makeText(context, text, Toast.LENGTH_LONG).show());
     }
 
     @Override
@@ -58,5 +70,25 @@ public class MainActivity extends AppCompatActivity implements OnRequestPermissi
             }
         }
     }
+
+//    public void showNotification(){
+//
+//        int NOTIFICATION_ID = 42;
+//        String CHANNEL_ID = "notification channel";
+//
+//        NotificationCompat.Builder builder =
+//                new NotificationCompat.Builder(MainActivity.this, CHANNEL_ID)
+//                        .setSmallIcon(R.drawable.android)
+//                        .setContentTitle("Notification")
+//                        .setContentText("This is notification.")
+//                        .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+//
+//        NotificationManagerCompat notificationManager =
+//                NotificationManagerCompat.from(MainActivity.this);
+//        notificationManager.notify(NOTIFICATION_ID, builder.build());
+//
+//
+//
+//    }
 
 }
