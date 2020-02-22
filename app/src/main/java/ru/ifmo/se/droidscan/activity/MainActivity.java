@@ -71,24 +71,4 @@ public class MainActivity extends AppCompatActivity implements OnRequestPermissi
         }
     }
 
-//    public void showNotification(){
-//
-//        int NOTIFICATION_ID = 42;
-//        String CHANNEL_ID = "notification channel";
-//
-//        NotificationCompat.Builder builder =
-//                new NotificationCompat.Builder(MainActivity.this, CHANNEL_ID)
-//                        .setSmallIcon(R.drawable.android)
-//                        .setContentTitle("Notification")
-//                        .setContentText("This is notification.")
-//                        .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-//
-//        NotificationManagerCompat notificationManager =
-//                NotificationManagerCompat.from(MainActivity.this);
-//        notificationManager.notify(NOTIFICATION_ID, builder.build());
-//
-//
-//
-//    }
-
 }
